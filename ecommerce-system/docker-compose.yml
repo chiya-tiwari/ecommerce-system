@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  product-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: product_service
+    ports:
+      - "5001:5001"
+    environment:
+      - FLASK_APP=product_service.py
+      - FLASK_ENV=production
+    command: python product_service.py
+
+  user-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: user_service
+    ports:
+      - "5002:5002"
+    environment:
+      - FLASK_APP=user_service.py
+      - FLASK_ENV=production
+    command: python user_service.py
+
+  order-service:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: order_service
+    ports:
+      - "5003:5003"
+    environment:
+      - FLASK_APP=order_service.py
+      - FLASK_ENV=production
+    command: python order_service.py
+
+  api-gateway:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: api_gateway
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=production
+    command: python app.py
+    depends_on:
+      - product-service
+      - user-service
+      - order-service
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ecommerce_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - api-gateway
